@@ -3,7 +3,6 @@ import { APIService } from '../config/service/apiService';
 import apiUrl from '../api.constant';
 import { Paper, Button, TablePagination } from '@material-ui/core';
 import { Post } from '../config/model/post.model';
-import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -11,25 +10,14 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
-const useStyles = makeStyles({
-    table: {
-        minWidth: 650,
-    },
-});
-function BasicTable() {
-    const classes = useStyles();
-    console.log(classes);
-    return classes;
-}
-
-
 export default class PostListing extends Component {
     constructor(props){
         super(props);
         this.state = {
             posts: [],
             page: 0,
-            rowsPerPage: [30]
+            rowsPerPage: [30],
+            buttonText: "Refresh"
         }
     }
     componentDidMount = async() => {
@@ -38,11 +26,13 @@ export default class PostListing extends Component {
     }
 
     getPostData = async() => {
+        this.setState({buttonText:"loading...."})
         const {page} = this.state;
         let apiService = new APIService();
         let requestData = await apiService.getRequest(`${apiUrl.list}?page=${page+1}`);
         const postData = Object.values(requestData).map(item => new Post(item));
         this.setState({posts: postData});
+        this.setState({buttonText:"Refresh"})
     }
 
     handleChangePage = async (e, newPage) => {
@@ -57,7 +47,7 @@ export default class PostListing extends Component {
 
     render() {
 
-        const { posts,rowsPerPage,page } = this.state;
+        const { posts,rowsPerPage,page, buttonText } = this.state;
         const header={
             display: 'flex',
             flexDirection: 'row',
@@ -75,31 +65,11 @@ export default class PostListing extends Component {
             background: '#cdcdcd'
 
         }
-        const mainContainer = {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            // alignItems: 'center',
-            width: '40%',
-            margin: '30px',
-            padding: '10px',
-            borderRadius: '5px'
-        }
         const classes = {
             table: {
                 minWidth: 650,
             }
         }
-        const postEnteries = posts.map((keys, i) => {
-            return (
-              <Paper elevation={0} style={mainContainer} key={i} square>
-                <h3>{keys.name}</h3>
-                <h4>{keys.email}</h4>
-                <p>{keys.body}</p>
-              </Paper>
-            );
-          });
-        // const c = BasicTable();
 
         return (<div>
                 <div style={header}>
@@ -111,7 +81,7 @@ export default class PostListing extends Component {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={e => this.getPostData()}>Refresh</Button>
+                        onClick={e => this.getPostData()}>{buttonText}</Button>
                 </div>
                 <div style={root}>
                     <TableContainer component={Paper}>
