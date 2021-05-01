@@ -32,7 +32,7 @@ export default class PostListing extends Component {
         let requestData = await apiService.getRequest(`${apiUrl.list}?page=${page+1}`);
         const postData = Object.values(requestData).map(item => new Post(item));
         this.setState({posts: postData});
-        this.setState({buttonText:"Refresh"})
+        setTimeout(() => this.setState({buttonText:"Refresh"}), 500);
     }
 
     handleChangePage = async (e, newPage) => {
